@@ -1,0 +1,460 @@
+<html>
+    <head>
+        <style>
+            canvas{
+                background-color: rgb(114, 35, 35); 
+            }
+            body{
+                background-color: black;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <center>
+            <canvas width="800" height="850" id="myCanvas"></canvas>
+        </center>
+
+    
+
+        <script>
+            
+            
+            var canvas = document.getElementById('myCanvas');
+            var ctx = canvas.getContext('2d');
+            var  dir = 0, speed = 10;
+            let score = 0;
+            let walls = [];
+            let ahora = new Date();
+            let segundos = ahora.getSeconds();
+            let minutos = ahora.getMinutes();
+            let pause = false;
+            let final = false;
+            let musica = false;
+            let music = 0;
+            let image = new Image();
+            let sonido = new Audio();
+            let sonido2 = new Audio();
+            let sonidoA = new Audio();
+            let image2 = new Image();
+            let image3 = new Image();
+
+
+            image3.src = "puerta.png";
+            image2.src = "biblioteca.png";
+            image.src = "estudiante.png"; 
+            sonido.src = "coin.mp3";
+            sonido2.src = "bites-ta-da-winner.mp3";
+            sonidoA.src = "espera.mp3";
+
+           
+            class Cuadrado{
+
+                constructor(x,y,w,h,c){
+                    this.x = x;
+                    this.y = y;
+                    this.w = w;
+                    this.h = h;
+                    this.c = c;
+                }
+
+                paint(ctx){
+
+                    ctx.fillStyle = this.c;
+                    ctx.fillRect(this.x,this.y,this.w,this.h);
+                    ctx.strokeRect(this.x,this.y,this.w,this.h);
+
+                }
+
+                seTocan(otro){
+                    if(this.x < otro.x + otro.w &&  
+                       this.x + this.w > otro.x &&  
+                       this.y < otro.y + otro.h &&   
+                       this.y + this.h > otro.y  ) 
+                    { 
+                        return true;   
+                    }
+                    return false;
+                }
+
+            }
+
+            const player = new Cuadrado(15, 14,15,15,"black"); 
+            const fin = new Cuadrado(740, 800,30,30,"blue");
+            const target = new Cuadrado(randomInteger(750), randomInteger(750),20,20,"black");
+
+            //walls.push( new Cuadrado(0,490,450,10,"gray") );
+            //walls.push( new Cuadrado(50,0,450,10,"gray") );
+            //walls.push( new Cuadrado(25,170,320,10,"gray") );
+            //walls.push( new Cuadrado(490,10,50,450,"gray") );
+            //walls.push( new Cuadrado(0,45,10,450,"gray") );
+
+            walls.push( new Cuadrado(0,0,10,850,"green") );
+            walls.push( new Cuadrado(90,10,10,250,"red") );
+            walls.push( new Cuadrado(50,0,750,10,"green") );
+            walls.push( new Cuadrado(10,50,50,10,"gray") );
+            walls.push( new Cuadrado(50,100,50,10,"gray") );
+            walls.push( new Cuadrado(10,150,50,10,"gray") );
+            walls.push( new Cuadrado(50,200,50,10,"gray") );
+            walls.push( new Cuadrado(10,250,50,10,"gray") );
+            //walls.push( new Cuadrado(50,250,10,70,"gray") );
+            walls.push( new Cuadrado(50,310,70,10,"gray") );
+            walls.push( new Cuadrado(120,200,10,120,"red") );
+            walls.push( new Cuadrado(150,50,100,10,"gray") );
+            walls.push( new Cuadrado(100,150,50,10,"gray") );
+            walls.push( new Cuadrado(120,190,60,10,"gray") );
+            walls.push( new Cuadrado(150,50,10,110,"red") );
+            walls.push( new Cuadrado(180,120,10,150,"red") );
+            walls.push( new Cuadrado(180,110,100,10,"gray") );
+            walls.push( new Cuadrado(180,260,60,10,"gray") );
+            walls.push( new Cuadrado(210,120,10,50,"red") );
+            walls.push( new Cuadrado(210,190,10,30,"red") );
+            walls.push( new Cuadrado(280,50,10,70,"red") );
+            walls.push( new Cuadrado(290,50,50,10,"gray") );
+            walls.push( new Cuadrado(380,0,10,100,"red") );
+            walls.push( new Cuadrado(580,0,10,50,"red") );
+            walls.push( new Cuadrado(490,50,100,10,"gray") );
+            walls.push( new Cuadrado(630,50,100,10,"gray") );
+            walls.push( new Cuadrado(660,60,10,250,"red") );
+            walls.push( new Cuadrado(330,100,300,10,"gray") );
+            walls.push( new Cuadrado(430,50,10,50,"red") );
+            walls.push( new Cuadrado(570,110,10,150,"red") );
+            walls.push( new Cuadrado(620,110,10,100,"red") );
+            walls.push( new Cuadrado(570,250,100,10,"gray") );
+            walls.push( new Cuadrado(660,300,50,10,"gray") );
+            walls.push( new Cuadrado(760,250,50,10,"gray") );
+            walls.push( new Cuadrado(760,150,50,10,"gray") );
+            walls.push( new Cuadrado(760,150,10,50,"red") );
+            walls.push( new Cuadrado(700,250,10,50,"red") );
+            walls.push( new Cuadrado(740,400,60,10,"gray") );
+            walls.push( new Cuadrado(600,350,150,10,"gray") );
+            walls.push( new Cuadrado(730,200,10,150,"red") );
+            walls.push( new Cuadrado(700,200,30,10,"gray") );
+            walls.push( new Cuadrado(700,100,10,100,"red") );
+            walls.push( new Cuadrado(725,100,10,40,"red") );
+            walls.push( new Cuadrado(700,100,50,10,"gray") );
+            walls.push( new Cuadrado(480,100,10,60,"red") );
+            walls.push( new Cuadrado(530,140,10,170,"red") );
+            walls.push( new Cuadrado(490,200,10,150,"red") );
+            walls.push( new Cuadrado(450,190,80,10,"gray") );
+            walls.push( new Cuadrado(530,310,70,10,"gray") );
+            walls.push( new Cuadrado(590,310,10,50,"red") );
+            walls.push( new Cuadrado(700,350,10,100,"red") );
+            walls.push( new Cuadrado(630,450,100,10,"gray") );
+            walls.push( new Cuadrado(680,500,90,10,"gray") );
+            walls.push( new Cuadrado(760,400,10,100,"red") );
+            walls.push( new Cuadrado(700,500,10,100,"red") );
+            walls.push( new Cuadrado(220,210,60,10,"gray") );
+            walls.push( new Cuadrado(220,190,50,10,"gray") );
+            walls.push( new Cuadrado(260,160,10,30,"red") );
+            walls.push( new Cuadrado(260,150,80,10,"gray") );
+            walls.push( new Cuadrado(330,100,10,50,"red") );
+            walls.push( new Cuadrado(440,150,10,50,"red") );
+            walls.push( new Cuadrado(390,150,60,10,"gray") );
+            walls.push( new Cuadrado(380,150,10,160,"red") );
+            walls.push( new Cuadrado(330,300,80,10,"gray") );
+            walls.push( new Cuadrado(330,200,10,160,"red") );
+            //walls.push( new Cuadrado(290,190,50,10,"gray") );
+            walls.push( new Cuadrado(290,350,50,10,"gray") );
+            walls.push( new Cuadrado(410,200,10,50,"red") );
+            walls.push( new Cuadrado(450,260,10,130,"red") );
+            walls.push( new Cuadrado(410,250,50,10,"gray") );
+            walls.push( new Cuadrado(400,350,50,10,"gray") );
+            walls.push( new Cuadrado(450,390,50,10,"gray") );
+            walls.push( new Cuadrado(390,350,10,80,"red") );
+            walls.push( new Cuadrado(230,400,170,10,"gray") );
+            walls.push( new Cuadrado(230,400,10,70,"red") );
+            //walls.push( new Cuadrado(350,400,10,50,"red") );
+            walls.push( new Cuadrado(280,210,10,90,"red") );
+            walls.push( new Cuadrado(250,300,10,100,"red") );
+            walls.push( new Cuadrado(260,300,30,10,"gray") );
+            walls.push( new Cuadrado(200,260,10,110,"red") );
+            walls.push( new Cuadrado(50,360,150,10,"gray") );
+            //walls.push( new Cuadrado(170,300,10,70,"red") );
+            walls.push( new Cuadrado(120,360,10,180,"red") );
+            walls.push( new Cuadrado(130,530,140,10,"gray") );
+            walls.push( new Cuadrado(270,450,10,130,"red") );
+            walls.push( new Cuadrado(270,440,40,10,"gray") );
+            walls.push( new Cuadrado(90,570,180,10,"gray") );
+            walls.push( new Cuadrado(80,540,10,80,"red") );
+            walls.push( new Cuadrado(180,580,10,40,"red") );
+            walls.push( new Cuadrado(300,440,10,50,"red") );
+            walls.push( new Cuadrado(300,490,130,10,"gray") );
+            walls.push( new Cuadrado(370,450,10,40,"red") );
+            walls.push( new Cuadrado(420,400,10,90,"red") );
+            walls.push( new Cuadrado(430,430,110,10,"gray") );
+            walls.push( new Cuadrado(530,350,10,90,"red") );
+            walls.push( new Cuadrado(490,340,50,10,"gray") );
+            walls.push( new Cuadrado(50,380,10,40,"red") );
+            //walls.push( new Cuadrado(50,400,40,10,"gray") );
+            walls.push( new Cuadrado(80,400,10,60,"red") );
+            walls.push( new Cuadrado(50,460,40,10,"gray") );
+            walls.push( new Cuadrado(50,470,10,190,"red") );
+            walls.push( new Cuadrado(50,650,250,10,"gray") );
+            walls.push( new Cuadrado(120,620,10,80,"red") );
+            walls.push( new Cuadrado(10,700,120,10,"gray") );
+            walls.push( new Cuadrado(150,750,100,10,"gray") );
+            walls.push( new Cuadrado(150,750,10,50,"red") );
+            walls.push( new Cuadrado(200,700,10,50,"red") );
+            walls.push( new Cuadrado(250,750,10,70,"red") );
+            walls.push( new Cuadrado(350,750,150,10,"gray") );
+            walls.push( new Cuadrado(250,800,130,10,"gray") );
+            walls.push( new Cuadrado(350,750,10,50,"red") );
+            //walls.push( new Cuadrado(400,780,60,10,"gray") );
+            walls.push( new Cuadrado(430,780,10,50,"red") );
+            walls.push( new Cuadrado(470,750,10,50,"red") );
+            walls.push( new Cuadrado(470,790,30,10,"gray") );
+            walls.push( new Cuadrado(490,790,10,30,"red") );
+            walls.push( new Cuadrado(490,810,60,10,"gray") );
+            walls.push( new Cuadrado(540,750,10,70,"red") );
+            walls.push( new Cuadrado(540,740,210,10,"gray") );
+            walls.push( new Cuadrado(700,780,100,10,"gray") );
+            walls.push( new Cuadrado(740,600,10,140,"red") );
+            walls.push( new Cuadrado(650,650,100,10,"gray") );
+            walls.push( new Cuadrado(680,550,50,10,"gray") );
+            walls.push( new Cuadrado(640,500,10,200,"red") );
+            walls.push( new Cuadrado(620,400,10,100,"red") );
+            walls.push( new Cuadrado(620,500,30,10,"gray") );
+            walls.push( new Cuadrado(620,700,70,10,"gray") );
+            walls.push( new Cuadrado(450,700,10,50,"red") );
+            walls.push( new Cuadrado(490,650,10,100,"red") );
+            walls.push( new Cuadrado(550,550,10,100,"red") );
+            walls.push( new Cuadrado(500,500,10,50,"red") );
+            walls.push( new Cuadrado(500,500,80,10,"gray") );
+            walls.push( new Cuadrado(500,550,50,10,"gray") );
+            walls.push( new Cuadrado(500,650,60,10,"gray") );
+            walls.push( new Cuadrado(350,620,10,80,"red") );
+            walls.push( new Cuadrado(290,650,10,50,"red") );
+            walls.push( new Cuadrado(290,700,130,10,"gray") );
+            walls.push( new Cuadrado(380,570,10,80,"red") );
+            walls.push( new Cuadrado(410,650,10,50,"red") );
+            walls.push( new Cuadrado(420,500,10,100,"red") );
+            walls.push( new Cuadrado(380,580,50,10,"gray") );
+            walls.push( new Cuadrado(340,560,50,10,"gray") );
+            walls.push( new Cuadrado(310,620,50,10,"gray") );
+            walls.push( new Cuadrado(789,0,10,850,"green") );
+            walls.push( new Cuadrado(0,840,740,10,"green") );
+
+            window.requestAnimationFrame = (function () {
+                return window.requestAnimationFrame ||
+                    window.webkitRequestAnimationFrame ||
+                    window.mozRequestAnimationFrame ||
+                    function (callback) {
+                        window.setTimeout(callback, 17);
+                    };
+            }());
+            
+            document.addEventListener("keydown", (e) =>{
+
+                if (!pause) {
+                    switch(e.keyCode){ 
+                        case 87:
+                            dir = 1;
+                        break;
+                        case 83:
+                            dir = 2;
+                        break;
+                        case 68:
+                            dir = 3;
+                        break; 
+                        case 65:
+                            dir = 4;
+                        break; 
+
+                    }  
+                    sonidoA.play()
+                    
+                    
+                }
+
+                switch(e.keyCode){  
+                    case 32:
+                         //speed+=5;
+                        pause = !pause;
+                    break; 
+                }
+
+            })
+
+            
+            function actualizarTiempo() {
+
+                let ahora = new Date();
+                let segundos = ahora.getSeconds();
+                let minutos = ahora.getMinutes();
+                
+
+                const horaFormateada = (minutos+ segundos);
+                times = ("min:"+ minutos+"  seg:"+ segundos);
+                return(times);
+
+                
+            } 
+
+            function update(){ 
+
+                if (!pause) {
+                    if (dir == 1) {
+                        player.y-=speed;
+                        if (player.y+50 < 0) {
+                           // player.y = 550;
+
+                        }
+                    }
+                    if (dir == 2) {
+                        player.y+=speed;
+                        if (player.y+50 > 500) {
+                            //player.y = -50;
+                        }
+                    }
+                    if (dir == 3) {
+                        player.x+=speed;
+                        if (player.x+50 > 500) {
+                            //player.x = -50;
+                        }
+                    }
+                    if (dir == 4) {
+                        player.x-=speed;
+                        if (player.x+50 < 0) {
+                            //player.x = 550;
+                        }
+                    } 
+                    if (player.seTocan(fin)) {
+
+                        sonidoA.pause();
+                        sonido2.play();
+
+                        final = !final;
+
+
+                        
+                        
+
+                        }
+
+
+                    if (player.seTocan(target)) {
+
+                        target.x = randomInteger(460);
+                        target.y = randomInteger(460);
+                        score+=1
+
+                        sonido.pause();
+                        sonido.play();
+                    }
+
+                    for (var i = walls.length - 1; i >= 0; i--) { 
+
+                        if (player.seTocan(walls[i])) {
+                            
+
+                            if (dir == 1) {
+                                player.y+=speed;
+                            }
+                            if (dir == 2) {
+                                player.y-=speed;
+                            }
+                            if (dir == 3) {
+                                player.x-=speed;
+                            }
+                            if (dir == 4) {
+                                player.x+=speed;
+                            }
+                            dir = 0;
+                        }
+
+                        if (target.seTocan(walls[i])) {
+                            target.x = randomInteger(460);
+                            target.y = randomInteger(460);
+                        }
+                    } 
+
+                } 
+
+                paint(); 
+                window.requestAnimationFrame(update); 
+            }
+
+            //esta solo pinta
+            function paint()
+            {
+                ctx.fillStyle = "white";
+                ctx.fillRect(0,0,800,850);
+
+                ctx.font = "20px Georgia";
+                ctx.fillStyle = "black";
+                ctx.fillText("Escore: "+score, 290, 25);
+    
+
+                ctx.font = "20px Georgia";
+                ctx.fillStyle = "black";
+                ctx.fillText("time: "+actualizarTiempo(), 400, 25);
+                
+                player.c = randomRgbColor();
+                //player.paint(ctx); 
+                ctx.drawImage(image,player.x,player.y,20,20);
+
+                //fin.paint(ctx);
+                ctx.drawImage(image3,fin.x,fin.y,50,50);
+
+                
+
+                ctx.drawImage(image2,target.x,target.y,15,15);
+                //target.paint(ctx);
+
+                for (var i = walls.length - 1; i >= 0; i--) {
+                    walls[i].paint(ctx);
+                }
+
+                if (pause) {
+
+                    ctx.fillStyle = "rgba(154,160,154,0.5)";
+                    ctx.fillRect(0,0,800,850);
+
+                    ctx.font = "40px Georgia";
+                    ctx.fillStyle = "black";
+                    ctx.fillText("P A U S E", 300, 400);
+                }
+
+                if (final) {
+
+                    ctx.fillStyle = "rgba(230,12,12,0.7)";
+                    ctx.fillRect(0,0,800,850);
+
+                    
+                    if (score<6) {
+                        ctx.font = "40px Georgia";
+                        ctx.fillStyle = "black";
+                        ctx.fillText("fuiste muy rapido y no pasate :( ", 150, 400);
+                        
+                    } 
+                    if (score>=6 && score<8) {
+                        ctx.font = "40px Georgia";
+                        ctx.fillStyle = "black";
+                        ctx.fillText("pasar es pasar ", 300, 400);
+                    }
+                    if (score>=8) {
+                        ctx.font = "40px Georgia";
+                        ctx.fillStyle = "black";
+                        ctx.fillText("oye oye mas despacio cerebrito ", 150, 400);
+                    }
+
+                }
+
+            }
+
+            update();
+
+
+            function randomRgbColor() {
+                let r = randomInteger(255);
+                let g = randomInteger(255);
+                let b = randomInteger(255);
+                return "rgba("+r+","+g+","+b+",0.5)";
+            }
+            function randomInteger(max) {
+                return Math.floor(Math.random()*(max + 1));
+            } 
+        </script>
+    </body>
+</html>
